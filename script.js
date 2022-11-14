@@ -2,6 +2,8 @@ const playPauseBtn = document.querySelector('.play-pause-btn')
 const theaterBtn = document.querySelector('.theater-btn')
 const fullScreenBtn = document.querySelector('.full-screen-btn')
 const miniPlayerBtn = document.querySelector('.mini-player-btn')
+const muteBtn = document.querySelector('.mute-btn')
+const volumeSlider = document.querySelector('.volume-slider')
 const video = document.querySelector('video')
 const videoContainer = document.querySelector('.video-container')
 
@@ -28,11 +30,40 @@ document.addEventListener('keydown',e => {
         case 'i':
             toggleMiniPlayerMode()
         break
+
+        case 'm':
+            toggleMute()
+        break
     }
 }) 
 
-// View modes
+// Volume 
+muteBtn.addEventListener('click', toggleMute) // When clicking the mute button, toggleMute is called
+volumeSlider.addEventListener('input', event => {
+    video.volume = event.target.value 
+    video.muted = event.target.value === 0 // If the slider value is 0, video is muted
+})
 
+function toggleMute() {
+    video.muted = !video.muted
+} // Video muted property is swapped
+
+video.addEventListener('volumechange', () => {
+    volumeSlider.value = video.volume
+    let volumeLevel
+    if (video.muted || video.volume === 0) {
+        volumeSlider.value = 0 // If the video is muted, the slider value is all the way to the left
+        volumeLevel = "muted"
+    } else if (video.volume >= 0.5) {
+        volumeLevel = "high"
+    } else {
+        volumeLevel = "low"
+    }
+
+    videoContainer.dataset.volumeLevel = volumeLevel
+})
+
+// View modes
 theaterBtn.addEventListener('click', toggleTheaterMode)
 fullScreenBtn.addEventListener('click', toggleFullScreenMode)
 miniPlayerBtn.addEventListener('click', toggleMiniPlayerMode)
