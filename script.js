@@ -3,6 +3,8 @@ const theaterBtn = document.querySelector('.theater-btn')
 const fullScreenBtn = document.querySelector('.full-screen-btn')
 const miniPlayerBtn = document.querySelector('.mini-player-btn')
 const muteBtn = document.querySelector('.mute-btn')
+const currentTimeElement = document.querySelector('.current-time')
+const totalTimeElement = document.querySelector('.total-time')
 const volumeSlider = document.querySelector('.volume-slider')
 const video = document.querySelector('video')
 const videoContainer = document.querySelector('.video-container')
@@ -34,8 +36,48 @@ document.addEventListener('keydown',e => {
         case 'm':
             toggleMute()
         break
+
+        case 'arrowLeft':
+        case 'j':
+            skip(-5)
+        break
+
+        case 'arrowRight':
+        case 'l':
+            skip(+5)
+        break
     }
 }) 
+
+// Duration
+
+video.addEventListener('loadeddata', () => {
+    totalTimeElement.textContent = durationFormat(video.duration)
+}) // Plugs video duration into durationFormat function to output a Math.floor duration
+
+video.addEventListener('timeupdate', () => {
+    currentTimeElement.textContent = durationFormat(video.currentTime)
+}) // timeupdate function gets called everytime the time is updated, and when it is the text content is replaced by the current time
+
+const leadingZeroFormatter = new Intl.NumberFormat(undefined, {
+    minimumIntegerDigits: 2
+}) // Always 2 digits present, leads with 0 if less than 10
+
+function durationFormat(time) {
+    const seconds = Math.floor(time % 60)
+    const minutes = Math.floor(time / 60) % 60
+    const hours = Math.floor(time / 3600)
+
+    if (hours === 0) {
+        return `${minutes}:${leadingZeroFormatter.format(seconds)}`
+    } else {
+        return `${hours}:${leadingZeroFormatter.format(minutes)}:${leadingZeroFormatter.format(seconds)}`
+    }
+}
+
+function skip(duration) {
+    video.currentTime += duration
+}
 
 // Volume 
 muteBtn.addEventListener('click', toggleMute) // When clicking the mute button, toggleMute is called
