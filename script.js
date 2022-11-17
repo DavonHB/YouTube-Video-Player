@@ -3,6 +3,7 @@ const theaterBtn = document.querySelector('.theater-btn')
 const fullScreenBtn = document.querySelector('.full-screen-btn')
 const miniPlayerBtn = document.querySelector('.mini-player-btn')
 const muteBtn = document.querySelector('.mute-btn')
+const captionsBtn = document.querySelector('.captions-btn')
 const currentTimeElement = document.querySelector('.current-time')
 const totalTimeElement = document.querySelector('.total-time')
 const volumeSlider = document.querySelector('.volume-slider')
@@ -49,8 +50,19 @@ document.addEventListener('keydown',e => {
     }
 }) 
 
-// Duration
+// Captions
+// const captions = video.textTracks[0]
+// captions.mode = 'hidden' // Get the first text track (our captions) and set the mode to hidden so it is not visible by default
 
+// captionsBtn.addEventListener('click', toggleCaptions) 
+
+// function toggleCaptions() {
+//     const isHidden = captions.mode === 'hidden' // setting captions mode if it is hidden to the variable isHidden
+//     captions.mode = isHidden ? 'showing' : 'hidden' // if the first text track mode is hidden, then set to showing, otherwise keep hidden
+//     videoContainer.classList.toggle('captions', isHidden) // if isHidden is true then toggle the caption class on the video container class list
+// }
+
+// Duration
 video.addEventListener('loadeddata', () => {
     totalTimeElement.textContent = durationFormat(video.duration)
 }) // Plugs video duration into durationFormat function to output a Math.floor duration
