@@ -4,6 +4,7 @@ const fullScreenBtn = document.querySelector('.full-screen-btn')
 const miniPlayerBtn = document.querySelector('.mini-player-btn')
 const muteBtn = document.querySelector('.mute-btn')
 const captionsBtn = document.querySelector('.captions-btn')
+const speedBtn = document.querySelector('.speed-btn')
 const currentTimeElement = document.querySelector('.current-time')
 const totalTimeElement = document.querySelector('.total-time')
 const volumeSlider = document.querySelector('.volume-slider')
@@ -47,8 +48,22 @@ document.addEventListener('keydown',e => {
         case 'l':
             skip(+5)
         break
+
+        // case 'c':
+        //     toggleCaptions()
+        // break;
     }
 }) 
+
+// Playback Speed
+speedBtn.addEventListener('click', changePlaybackSpeed)
+
+function changePlaybackSpeed() {
+    let newPlaybackRate = video.playbackRate + .25 // adding on .25 to the video playback rate
+    if (newPlaybackRate > 2) newPlaybackRate = 0.25 // if the video playback rate is above 2, set it back to .25
+    video.playbackRate = newPlaybackRate // video playbackRate is set to the newPlayback rate
+    speedBtn.textContent = `${newPlaybackRate}x` // show the play back rate by setting it to the text content on the speed btn
+}
 
 // Captions
 // const captions = video.textTracks[0]

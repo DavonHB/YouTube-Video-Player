@@ -157,3 +157,7 @@ video {
 /* .video-container.captions .captions-btn {
   border-bottom: 3px solid red;  
 } */
+
+.video-controls-container .controls button.wide-btn {
+    width: 50px;
+}
