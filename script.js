@@ -7,9 +7,12 @@ const captionsBtn = document.querySelector('.captions-btn')
 const speedBtn = document.querySelector('.speed-btn')
 const currentTimeElement = document.querySelector('.current-time')
 const totalTimeElement = document.querySelector('.total-time')
+const previewImg = document.querySelector('.preview-img')
+const thumbnailImg = document.querySelector('.thumbnail-img')
 const volumeSlider = document.querySelector('.volume-slider')
 const video = document.querySelector('video')
 const videoContainer = document.querySelector('.video-container')
+const timelineContainer = document.querySelector('.timeline-container')
 
 document.addEventListener('keydown',e => {
     const tagName = document.activeElement.tagName.toLocaleLowerCase() // Going into the document to ind the activeElement, getting tis tag name and converting it to lowercase
@@ -55,6 +58,54 @@ document.addEventListener('keydown',e => {
     }
 }) 
 
+// Timeline
+
+timelineContainer.addEventListener('mousemove', handleTimelineUpdate)
+timelineContainer.addEventListener('mousedown', toggleScrubbing)
+document.addEventListener('mouseup', event => {
+    if (isScrubbing) toggleScrubbing(event)
+}) // if we are in the act of scrubbing we only want the document event listeners to fire
+
+document.addEventListener('mousemove', event => {
+    if (isScrubbing) handleTimelineUpdate(event)
+}) // We only want to handle the time line update if we are currently scrubbing
+
+let isScrubbing = false
+let wasPaused
+function toggleScrubbing(event) {
+    const rectangle = timelineContainer.getBoundingClientRect() // get rectangle within timeline container and set it to a variable
+    const percent = Math.min(Math.max(0, event.x - rectangle.x), rectangle.width) / rectangle.width // Clamped between two values, get the x position of the mouse and get the x position of the timeline and subtract both values giving us the x position within the timeline by taking into account any spacing between the timeline and the page. Rectangle.width is the farthest right position, while 0 is the farthest left position. All divided by the timeline width to give a percentage
+    
+    isScrubbing = (event.buttons & 1) === 1 // binary version of which buttons are being pressed, if the value returns 1 then the left button the mouse is being pressed
+
+    videoContainer.classList.toggle('scrubbing', isScrubbing) // toggle class scrubbing if isScrubbing is true
+
+    if (isScrubbing) {
+        wasPaused = video.paused // setting paused video state to a variable
+        video.pause() // pause video if scrubbing is true
+    } else {
+        video.currentTime = percent * video.duration // Move video to the position where the mouse was let go after scrubbing
+        if (!wasPaused) video.play() // When scrubbing is done, video will continue playing
+    }
+
+    handleTimelineUpdate(event) // when scrubbing starts, call handleTimelineUpdate 
+}
+
+function handleTimelineUpdate(event) {
+    const rectangle = timelineContainer.getBoundingClientRect() // get rectangle within timeline container and set it to a variable
+    const percent = Math.min(Math.max(0, event.x - rectangle.x), rectangle.width) / rectangle.width // Clamped between two values, get the x position of the mouse and get the x position of the timeline and subtract both values giving us the x position within the timeline by taking into account any spacing between the timeline and the page. Rectangle.width is the farthest right position, while 0 is the farthest left position. All divided by the timeline width to give a percentage
+    const previewImgNumber = Math.max(1, Math.floor((percent * video.duration) / 10)) // Takes our percent and outputs a number based on the video duration in intervals of 10
+    const previewImgSrc = `assets/previewImages/previewImage${previewImgNumber}.jpg` // Takes the outputted number in previewImageNumber and plugs it into a variable
+    previewImg.src = previewImgSrc // setting the preview image source (src='') to the variable declared above called previewImgSrc
+    timelineContainer.style.setProperty('--preview-position', percent)
+
+    if (isScrubbing) {
+        event.preventDefault()
+        thumbnailImg.src = previewImgSrc
+        timelineContainer.style.setProperty('--progress-position', percent)
+    }
+}
+
 // Playback Speed
 speedBtn.addEventListener('click', changePlaybackSpeed)
 
@@ -84,6 +135,9 @@ video.addEventListener('loadeddata', () => {
 
 video.addEventListener('timeupdate', () => {
     currentTimeElement.textContent = durationFormat(video.currentTime)
+
+    const percent = video.currentTime / video.duration
+    timelineContainer.style.setProperty('--progress-position', percent) // moves red bar along 
 }) // timeupdate function gets called everytime the time is updated, and when it is the text content is replaced by the current time
 
 const leadingZeroFormatter = new Intl.NumberFormat(undefined, {
